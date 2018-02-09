@@ -75,7 +75,7 @@ public class FileFormatter {
 				line = next + " ";
 			}
 		}
-		return newText += line;
+		return newText += line.trim();
 	}
 	
 	public static double avgLineLength(String text, int lines) {
