@@ -9,7 +9,7 @@ public class FileFormatter {
 		// This will be user input from the GUI
 		String oldFileName = "input";
 		String newFileName = "output";
-		String justified = "right";
+		String justified = "left";
 
 		// read file to string
 		String fileText = readFile(oldFileName);
@@ -36,6 +36,7 @@ public class FileFormatter {
 		sc.close();
 	}
 
+	// writes a string to a given file with a given justification
 	public static void writeFile(String text, String newFileName, String justified) {
 		CreateFile newFile = new CreateFile();
 		newFile.openFile(newFileName);
@@ -43,10 +44,11 @@ public class FileFormatter {
 		sc = new Scanner(text);
 		while (sc.hasNextLine())
 			newFile.writeToFile(sc.nextLine() + "\r", justified);
-
+		
 		newFile.closeFile();
 	}
 
+	// reads a file to a string
 	public static String readFile(String fileName) {
 		String text = "";
 
@@ -61,6 +63,8 @@ public class FileFormatter {
 		return text;
 	}
 
+	// splits/merges lines in a string so they are <= 80 in length
+	// words >= 80 in length will be on their own line
 	public static String reduceLineLength(String text) {
 		String next, line, newText;
 		line = next = newText = "";
@@ -78,6 +82,7 @@ public class FileFormatter {
 		return newText += line.trim();
 	}
 	
+	// count the length of each line and divide by the number of lines
 	public static double avgLineLength(String text, int lines) {
 		double avgLineLength = 0;
 		if (lines == 0)
@@ -93,6 +98,7 @@ public class FileFormatter {
 		return avgLineLength;
 	}
 
+	// count blank lines in a given string
 	public static int blankLines(String text) {
 		int count = 0;
 		sc = new Scanner(text);
@@ -104,6 +110,7 @@ public class FileFormatter {
 		return count;
 	}
 
+	// counts the words in a given string
 	public static int wordCount(String text) {
 		int count = 0;
 		sc = new Scanner(text);
@@ -112,10 +119,10 @@ public class FileFormatter {
 			count++;
 			sc.next();
 		}
-
 		return count;
 	}
 
+	// counts the lines in a given string
 	public static int lineCount(String text) {
 		int count = 0;
 		sc = new Scanner(text);
@@ -124,7 +131,6 @@ public class FileFormatter {
 			count++;
 			sc.nextLine();
 		}
-
 		return count;
 	}
 }
