@@ -8,11 +8,10 @@ public class FileFormatter {
 	public static void main(String[] args) {
 		// This will be user input from the GUI
 		String oldFileName = "input";
-		String newFileName = "output";
 		String justified = "left";
 		
-		// if old name = new name, append "_(formatted)" to prevent overwriting
-		newFileName = preventOverwrite(oldFileName,newFileName);
+		// get new file directory and prevent overwriting
+		String newFileName = getNewFileDir(oldFileName);
 
 		// read file to string
 		String fileText = readFile(oldFileName);
@@ -39,10 +38,16 @@ public class FileFormatter {
 		sc.close();
 	}
 	
-	// takes two file names and appends to the new file name if both are equal
-	public static String preventOverwrite(String oldFileName, String newFileName) {
-		if(oldFileName.equals(newFileName))
-			newFileName += "_(formatted)";
+	// get new file directory and prevent overwriting old file
+	public static String getNewFileDir(String oldFileName) {
+		sc = new Scanner(System.in);
+		String newFileName = "";
+		do {
+			System.out.print("Enter formatted file directory: ");
+			newFileName = sc.next();
+			if(newFileName.equals(oldFileName))
+				System.out.println("Error, file directories are the same.\n");
+		}while(newFileName.equals(oldFileName));
 		return newFileName;
 	}
 
