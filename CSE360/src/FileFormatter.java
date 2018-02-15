@@ -10,6 +10,9 @@ public class FileFormatter {
 		String oldFileName = "input";
 		String newFileName = "output";
 		String justified = "left";
+		
+		// if old name = new name, append "_(formatted)" to prevent overwriting
+		newFileName = preventOverwrite(oldFileName,newFileName);
 
 		// read file to string
 		String fileText = readFile(oldFileName);
@@ -34,6 +37,13 @@ public class FileFormatter {
 		System.out.println("Average words per line: " + words / lines);
 		System.out.println("Average line length: " + avgLineLength);
 		sc.close();
+	}
+	
+	// takes two file names and appends to the new file name if both are equal
+	public static String preventOverwrite(String oldFileName, String newFileName) {
+		if(oldFileName.equals(newFileName))
+			newFileName += "_(formatted)";
+		return newFileName;
 	}
 
 	// writes a string to a given file with a given justification
