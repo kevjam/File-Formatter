@@ -7,144 +7,127 @@ public class FileFormatter {
 
 	public static void main(String[] args) {
 		// This will be user input from the GUI
+		String newFileName = "output";
 		String oldFileName = "input";
 		String justified = "left";
-		
-		// get new file directory and prevent overwriting
-		String newFileName = getNewFileDir(oldFileName);
 
-		// read file to string
-		String fileText = readFile(oldFileName);
-		
-		// get blank lines in the file
-		int blankLines = blankLines(fileText);
+		File oldFile = new File(oldFileName);
+		File newFile = new File(newFileName);
 
-		// merge lines and reduce them to <= 80 char
-		fileText = reduceLineLength(fileText);
-		
-		// write reduced text to file
-		writeFile(fileText, newFileName, justified);
+		// write from file to file
+		writeFile(oldFile, newFileName, justified);
 
-		// everything below will be part of the analysis report
-		int words = wordCount(fileText);
-		int lines = lineCount(fileText);
-		double avgLineLength = avgLineLength(fileText, lines);
-		System.out.println("Analysis Report");
-		System.out.println("Word count: " + words);
-		System.out.println("Line count: " + lines);
-		System.out.println("Blank lines removed: " + blankLines);
-		System.out.println("Average words per line: " + words / lines);
-		System.out.println("Average line length: " + avgLineLength);
+		// print analysis report
+		analysisReport(oldFile, newFile);
+
 		sc.close();
 	}
-	
-	// get new file directory and prevent overwriting old file
-	public static String getNewFileDir(String oldFileName) {
-		sc = new Scanner(System.in);
-		String newFileName = "";
-		do {
-			System.out.print("Enter formatted file directory: ");
-			newFileName = sc.next();
-			if(newFileName.equals(oldFileName))
-				System.out.println("Error, file directories are the same.\n");
-		}while(newFileName.equals(oldFileName));
-		return newFileName;
+
+	// print analysis report
+	public static void analysisReport(File oldFile, File newFile) {
+		int words = wordCount(newFile);
+		int lines = lineCount(newFile);
+		int wordsPerLine = 0;
+		int avgLineLength = 0;
+
+		if (lines != 0)
+		{
+			wordsPerLine = words / lines;
+			avgLineLength = totalLineLength(newFile) / lines;
+		}
+
+		System.out.println("Analysis Report");
+		System.out.println("--------------------------");
+		System.out.println(words + "\twords processed.");
+		System.out.println(lines + "\tlines processed.");
+		System.out.println(blankLines(oldFile) + "\tblank lines removed.");
+		System.out.println(wordsPerLine + "\taverage words per line.");
+		System.out.println(avgLineLength + "\taverage line length.");
 	}
 
-	// writes a string to a given file with a given justification
-	public static void writeFile(String text, String newFileName, String justified) {
+	// writes from file to file
+	public static void writeFile(File inputFile, String newFileName, String justification) {
 		CreateFile newFile = new CreateFile();
 		newFile.openFile(newFileName);
 
-		sc = new Scanner(text);
-		while (sc.hasNextLine())
-			newFile.writeToFile(sc.nextLine() + "\r", justified);
-		
-		newFile.closeFile();
-	}
-
-	// reads a file to a string
-	public static String readFile(String fileName) {
-		String text = "";
+		String next, line;
+		next = line = "";
 
 		try {
-			File file = new File(fileName);
-			sc = new Scanner(file);
-			while (sc.hasNextLine())
-				text += sc.nextLine() + "\r";
+			sc = new Scanner(inputFile);
+			while (sc.hasNext()) {
+				next = sc.next();
+				if (line.length() + next.length() <= 80) // add word
+					line += next + " ";
+				else { // add line to text
+					newFile.writeToFile(line.trim() + "\r", justification);
+					line = next + " ";
+				}
+			}
+			newFile.writeToFile(line.trim(), justification);
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found.");
 		}
-		return text;
+		newFile.closeFile();
 	}
 
-	// splits/merges lines in a string so they are <= 80 in length
-	// words >= 80 in length will be on their own line
-	public static String reduceLineLength(String text) {
-		String next, line, newText;
-		line = next = newText = "";
-		sc = new Scanner(text);
-
-		while (sc.hasNext()) {
-			next = sc.next();
-			if (line.length() + next.length() <= 80) // add word
-				line += next + " ";
-			else { // add line to text
-				newText += line.trim() + "\r";
-				line = next + " ";
-			}
-		}
-		return newText += line.trim();
-	}
-	
 	// count the length of each line and divide by the number of lines
-	public static double avgLineLength(String text, int lines) {
-		double avgLineLength = 0;
-		if (lines == 0)
-			avgLineLength = 0;
-		else {
-			sc = new Scanner(text);
+	public static int totalLineLength(File file) {
+		int totalLineLength = 0;
+		try {
+			sc = new Scanner(file);
 
 			while (sc.hasNextLine())
-				avgLineLength += sc.nextLine().length();
-			
-			avgLineLength /= lines;
+				totalLineLength += sc.nextLine().trim().length();
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found.");
 		}
-		return avgLineLength;
+		return totalLineLength;
 	}
 
-	// count blank lines in a given string
-	public static int blankLines(String text) {
+	// count blank lines in a given file
+	public static int blankLines(File file) {
 		int count = 0;
-		sc = new Scanner(text);
 
-		while (sc.hasNextLine())
-			if ("".equals(sc.nextLine()))
+		try {
+			sc = new Scanner(file);
+			while (sc.hasNextLine())
+				if ("".equals(sc.nextLine()))
+					count++;
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found.");
+		}
+		return count;
+	}
+
+	// counts the words in a given file
+	public static int wordCount(File file) {
+		int count = 0;
+		try {
+			sc = new Scanner(file);
+
+			while (sc.hasNext()) {
 				count++;
-
-		return count;
-	}
-
-	// counts the words in a given string
-	public static int wordCount(String text) {
-		int count = 0;
-		sc = new Scanner(text);
-
-		while (sc.hasNext()) {
-			count++;
-			sc.next();
+				sc.next();
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found.");
 		}
 		return count;
 	}
 
-	// counts the lines in a given string
-	public static int lineCount(String text) {
+	// counts the lines in a given file
+	public static int lineCount(File file) {
 		int count = 0;
-		sc = new Scanner(text);
+		try {
+			sc = new Scanner(file);
 
-		while (sc.hasNextLine()) {
-			count++;
-			sc.nextLine();
+			while (sc.hasNextLine()) {
+				count++;
+				sc.nextLine();
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found.");
 		}
 		return count;
 	}
