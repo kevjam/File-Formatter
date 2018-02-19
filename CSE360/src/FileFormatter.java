@@ -6,23 +6,31 @@ public class FileFormatter {
 	private static Scanner sc;
 
 	public static void main(String[] args) {
+		
 		// This will be user input from the GUI
-		String newFileName = "output";
 		String oldFileName = "input";
+		String newFileName = "output";
 		String justified = "left";
-
+		
 		File oldFile = new File(oldFileName);
 		File newFile = new File(newFileName);
-
-		// write from file to file
-		writeFile(oldFile, newFileName, justified);
-
-		// print analysis report
-		analysisReport(oldFile, newFile);
-
-		sc.close();
+		
+		if(!samePath(oldFile, newFile)) {
+			writeFile(oldFile, newFileName, justified);
+			analysisReport(oldFile, newFile);
+		}
+		else 
+			System.out.println("Same input and output path.");
+		
+		if(sc != null)
+			sc.close();
 	}
-
+	
+	// returns true if two files share the same path
+	private static boolean samePath(File file1, File file2) {
+		return file1.getAbsolutePath().equals(file2.getAbsolutePath());
+	}
+	
 	// print analysis report
 	public static void analysisReport(File oldFile, File newFile) {
 		int words = wordCount(newFile);
@@ -66,7 +74,7 @@ public class FileFormatter {
 			}
 			newFile.writeToFile(line.trim(), justification);
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found.");
+			System.out.println("Input file not found.");
 		}
 		newFile.closeFile();
 	}
@@ -80,7 +88,7 @@ public class FileFormatter {
 			while (sc.hasNextLine())
 				totalLineLength += sc.nextLine().trim().length();
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found.");
+			System.out.println("Output file not found.");
 		}
 		return totalLineLength;
 	}
@@ -95,7 +103,7 @@ public class FileFormatter {
 				if ("".equals(sc.nextLine()))
 					count++;
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found.");
+			System.out.println("Input file not found.");
 		}
 		return count;
 	}
@@ -111,7 +119,7 @@ public class FileFormatter {
 				sc.next();
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found.");
+			System.out.println("Output file not found.");
 		}
 		return count;
 	}
@@ -127,7 +135,7 @@ public class FileFormatter {
 				sc.nextLine();
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println("File not found.");
+			System.out.println("Output file not found.");
 		}
 		return count;
 	}
