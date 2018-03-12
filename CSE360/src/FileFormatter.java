@@ -21,10 +21,8 @@ public class FileFormatter extends Application{
 	}
 	
 	@Override
-	public void start(Stage primaryStage) {
-		primaryStage.setTitle("File Formatter");
-		
-		// Input File
+	public void start(Stage primaryStage) {		
+		// Input File Field
 		HBox txtField = new HBox();
 		Text txt = new Text();
 		txt.setText("Input File: \t");
@@ -34,7 +32,7 @@ public class FileFormatter extends Application{
 		inputBrowse.setText("Browse");
 		txtField.getChildren().addAll(txt, inputField, inputBrowse);
 
-		// Ouput File
+		// Ouput File Field
 		HBox txtField2 = new HBox();
 		Text txt2 = new Text();
 		txt2.setText("Output File: \t");
@@ -69,7 +67,7 @@ public class FileFormatter extends Application{
 		operations.setSpacing(20);
 		operations.getChildren().addAll(runButton, analysisCheckBox);
 
-		// root pane
+		// Root pane
 		VBox root = new VBox();
 		VBox txtFields = new VBox();
 		txtFields.getChildren().addAll(txtField, txtField2);
@@ -77,11 +75,13 @@ public class FileFormatter extends Application{
 		root.setPadding(new Insets(20));
 		root.getChildren().addAll(txtFields, justification, operations);
 		
-		primaryStage.setScene(new Scene(root, 325, 150));
-		primaryStage.setMinWidth(400);
-		primaryStage.setMinHeight(150);
+		// Primary Stage
+		primaryStage.setTitle("File Formatter");
+		primaryStage.setScene(new Scene(root, 350, 150));
+		primaryStage.setResizable(false);
 		primaryStage.show();
 		
+		// Input File Browser
 		inputBrowse.setOnAction(new EventHandler<ActionEvent>() {
 		    @Override public void handle(ActionEvent e) {	
 		    	 FileChooser fileChooser = new FileChooser();
@@ -95,6 +95,7 @@ public class FileFormatter extends Application{
 		    }
 		});
 		
+		// Output File Browser
 		outputBrowse.setOnAction(new EventHandler<ActionEvent>() {
 		    @Override public void handle(ActionEvent e) {	
 		    	 FileChooser fileChooser = new FileChooser();
@@ -108,6 +109,7 @@ public class FileFormatter extends Application{
 		    }
 		});
 		
+		// Run Formatter button event
 		runButton.setOnAction(new EventHandler<ActionEvent>() {
 		    @Override public void handle(ActionEvent e) {		    	
 				String oldFileName = inputField.getText();
@@ -119,6 +121,7 @@ public class FileFormatter extends Application{
 				File oldFile = new File(oldFileName);
 				File newFile = new File(newFileName);
 				
+				// Write to file if not in the same path
 				if(!samePath(oldFile, newFile)) {
 					writeFile(oldFile, newFileName, justified);
 					if(analysisCheckBox.isSelected()) {
@@ -129,20 +132,18 @@ public class FileFormatter extends Application{
 						Text analysis = new Text(analysisReport(oldFile, newFile));
 						analysisReport.getChildren().add(analysis);
 						analysisPopup.setScene(new Scene(analysisReport, 250, 150));
-						analysisPopup.setMinWidth(250);
-						analysisPopup.setMinHeight(150);
+						analysisPopup.setResizable(false);
 						analysisPopup.show();
 					}
 				}
-				else 
-					errorWindow("Same input and output path.");
+				else errorWindow("Same input and output path.");
 				
-				if(sc != null)
-					sc.close();
+				if(sc != null) sc.close();
 		    }
 		});
 	}
 
+	// Takes a string as a message and creates an error popup
 	public static void errorWindow(String message) {
 		Stage errorPopup = new Stage();
 		errorPopup.setTitle("Error!");
@@ -151,16 +152,16 @@ public class FileFormatter extends Application{
 		Text error = new Text(message);
 		errorBox.getChildren().add(error);
 		errorPopup.setScene(new Scene(errorBox, 250, 100));
-		errorPopup.setMinWidth(250);
-		errorPopup.setMinHeight(150);
+		errorPopup.setResizable(false);
 		errorPopup.show();
 	}
-	// returns true if two files share the same path
+	
+	// Returns true if two files share the same path
 	private static boolean samePath(File file1, File file2) {
 		return file1.getAbsolutePath().equals(file2.getAbsolutePath());
 	}
 	
-	// print analysis report
+	// Returns a string containing the analysis report
 	public static String analysisReport(File oldFile, File newFile) {
 		String report = "";
 		int words = wordCount(newFile);
@@ -181,7 +182,7 @@ public class FileFormatter extends Application{
 		return report;
 	}
 
-	// writes from file to file
+	// Writes from file to file
 	public static void writeFile(File inputFile, String newFileName, String justification) {
 		CreateFile newFile = new CreateFile();
 		newFile.openFile(newFileName);
@@ -207,7 +208,7 @@ public class FileFormatter extends Application{
 		newFile.closeFile();
 	}
 
-	// count the length of each line and divide by the number of lines
+	// Count the length of all lines
 	public static int totalLineLength(File file) {
 		int totalLineLength = 0;
 		try {
@@ -221,7 +222,7 @@ public class FileFormatter extends Application{
 		return totalLineLength;
 	}
 
-	// count blank lines in a given file
+	// Count blank lines in a given file
 	public static int blankLines(File file) {
 		int count = 0;
 
@@ -236,7 +237,7 @@ public class FileFormatter extends Application{
 		return count;
 	}
 
-	// counts the words in a given file
+	// Counts the words in a given file
 	public static int wordCount(File file) {
 		int count = 0;
 		try {
@@ -252,7 +253,7 @@ public class FileFormatter extends Application{
 		return count;
 	}
 
-	// counts the lines in a given file
+	// Counts the lines in a given file
 	public static int lineCount(File file) {
 		int count = 0;
 		try {
