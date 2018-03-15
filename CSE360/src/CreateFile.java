@@ -13,17 +13,19 @@ public class CreateFile {
 		return successful;
 	}
 	
-	public void writeToFile(String line, String justified, int linelength) {
-		if(justified.equals("right")) writeRightJustified(line, linelength);
-		else writeLeftJustified(line);
+	public void writeToFile(String line, boolean newline, String justified, int linelength) {
+		if(justified.equals("right")) writeRightJustified(line, newline, linelength);
+		else writeLeftJustified(line, newline);
 	}
 	
-	public void writeLeftJustified(String line) {
-		formatter.format("%s%n",line);
+	public void writeLeftJustified(String line, boolean newline) {
+		if(newline) formatter.format("%s%n",line);
+		else formatter.format("%s", line);
 	}
 	
-	public void writeRightJustified(String line, int linelength) {
-		formatter.format("%"+linelength+"s%n", line);
+	public void writeRightJustified(String line, boolean newline, int linelength) {
+		if(newline) formatter.format("%" + linelength + "s%n",line);
+		else formatter.format("%"+linelength+"s", line);
 	}
 	
 	public void closeFile() {

@@ -208,11 +208,11 @@ public class FileFormatter extends Application {
 					if (line.length() + next.length() <= linelength) // add word
 						line += next + " ";
 					else { // add line to text
-						newFile.writeToFile(line.trim(), justification, linelength);
+						newFile.writeToFile(line.trim(), true, justification, linelength);
 						line = next + " ";
 					}
 				}
-				newFile.writeToFile(line.trim(), justification, linelength);
+				newFile.writeToFile(line.trim(), false, justification, linelength);
 			} catch (FileNotFoundException e) {
 				errorWindow("Input file not found.");
 			}
