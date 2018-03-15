@@ -13,57 +13,49 @@ import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class FileFormatter extends Application{
+public class FileFormatter extends Application {
 	private static Scanner sc;
+	public static final int linelength = 80;
 
 	public static void main(String[] args) {
 		launch(args);
 	}
-	
+
 	@Override
-	public void start(Stage primaryStage) {		
+	public void start(Stage primaryStage) {
 		// Input File Field
 		HBox txtField = new HBox();
-		Text txt = new Text();
-		txt.setText("Input File: \t");
+		Text txt = new Text("Input File: \t");
 		TextField inputField = new TextField();
 		inputField.setDisable(true);
-		Button inputBrowse = new Button();
-		inputBrowse.setText("Browse");
+		Button inputBrowse = new Button("Browse");
 		txtField.getChildren().addAll(txt, inputField, inputBrowse);
 
 		// Ouput File Field
 		HBox txtField2 = new HBox();
-		Text txt2 = new Text();
-		txt2.setText("Output File: \t");
+		Text txt2 = new Text("Output File: \t");
 		TextField outputField = new TextField();
 		outputField.setDisable(true);
-		Button outputBrowse = new Button();
-		outputBrowse.setText("Browse");
+		Button outputBrowse = new Button("Browse");
 		txtField2.getChildren().addAll(txt2, outputField, outputBrowse);
-		
+
 		// Justification Selection
 		HBox justification = new HBox();
 		ToggleGroup group = new ToggleGroup();
-		Text txt3 = new Text();
-		txt3.setText("Justification: \t");
-		RadioButton left = new RadioButton();
+		Text txt3 = new Text("Justification: \t");
+		RadioButton left = new RadioButton("Left (default)");
 		left.setToggleGroup(group);
 		left.setSelected(true);
-		left.setText("Left (default)");
-		RadioButton right = new RadioButton();
+		RadioButton right = new RadioButton("Right");
 		right.setToggleGroup(group);
 		right.setSelected(false);
-		right.setText("Right");
 		justification.setSpacing(20);
 		justification.getChildren().addAll(txt3, left, right);
-		
+
 		// Run program / analysis
 		HBox operations = new HBox();
-		Button runButton = new Button();
-		runButton.setText("Run Formatter");
-		CheckBox analysisCheckBox = new CheckBox();
-		analysisCheckBox.setText("Show Analysis");
+		Button runButton = new Button("Run Formatter");
+		CheckBox analysisCheckBox = new CheckBox("Show Analysis");
 		operations.setSpacing(20);
 		operations.getChildren().addAll(runButton, analysisCheckBox);
 
@@ -74,72 +66,66 @@ public class FileFormatter extends Application{
 		root.setSpacing(5);
 		root.setPadding(new Insets(20));
 		root.getChildren().addAll(txtFields, justification, operations);
-		
+
 		// Primary Stage
 		primaryStage.setTitle("File Formatter");
 		primaryStage.setScene(new Scene(root, 350, 150));
 		primaryStage.setResizable(false);
 		primaryStage.show();
-		
+
 		// Input File Browser
 		inputBrowse.setOnAction(new EventHandler<ActionEvent>() {
-		    @Override public void handle(ActionEvent e) {	
-		    	 FileChooser fileChooser = new FileChooser();
-		    	 fileChooser.setTitle("Open Input File");
-		    	 fileChooser.getExtensionFilters().addAll(
-		    	         new ExtensionFilter("Text Files", "*.txt"));
-		    	 File inputFile = fileChooser.showOpenDialog(primaryStage);
-		    	 if (inputFile != null) {
-		    	    inputField.setText(inputFile.getAbsolutePath());
-		    	 }
-		    }
+			@Override
+			public void handle(ActionEvent e) {
+				FileChooser fileChooser = new FileChooser();
+				fileChooser.setTitle("Open Input File");
+				fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"));
+				File inputFile = fileChooser.showOpenDialog(primaryStage);
+				if (inputFile != null) {
+					inputField.setText(inputFile.getAbsolutePath());
+				}
+			}
 		});
-		
+
 		// Output File Browser
 		outputBrowse.setOnAction(new EventHandler<ActionEvent>() {
-		    @Override public void handle(ActionEvent e) {	
-		    	 FileChooser fileChooser = new FileChooser();
-		    	 fileChooser.setTitle("Open Output File");
-		    	 fileChooser.getExtensionFilters().addAll(
-		    	         new ExtensionFilter("Text Files", "*.txt"));
-		    	 File outputFile = fileChooser.showOpenDialog(primaryStage);
-		    	 if (outputFile != null) {
-		    	    outputField.setText(outputFile.getAbsolutePath());
-		    	 }
-		    }
+			@Override
+			public void handle(ActionEvent e) {
+				FileChooser fileChooser = new FileChooser();
+				fileChooser.setTitle("Open Output File");
+				fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt"));
+				File outputFile = fileChooser.showOpenDialog(primaryStage);
+				if (outputFile != null) {
+					outputField.setText(outputFile.getAbsolutePath());
+				}
+			}
 		});
-		
+
 		// Run Formatter button event
 		runButton.setOnAction(new EventHandler<ActionEvent>() {
-		    @Override public void handle(ActionEvent e) {		    	
+			@Override
+			public void handle(ActionEvent e) {
+				String justified;
+				if (left.isSelected()) justified = "left";
+				else justified = "right";
+
 				String oldFileName = inputField.getText();
 				String newFileName = outputField.getText();
-				String justified;
-				if(left.isSelected()) justified = "left";
-				else justified = "right";
-				
 				File oldFile = new File(oldFileName);
 				File newFile = new File(newFileName);
-				
+
 				// Write to file if not in the same path
-				if(!samePath(oldFile, newFile)) {
+				if(oldFileName.equals("")) errorWindow("No input file selected.");
+				else if(newFileName.equals("")) errorWindow("No output file selected.");
+				else if (samePath(oldFile, newFile)) errorWindow("Same input and output path.");
+				else {
 					writeFile(oldFile, newFileName, justified);
-					if(analysisCheckBox.isSelected()) {
-						Stage analysisPopup = new Stage();
-						analysisPopup.setTitle("Analysis Report");
-						VBox analysisReport = new VBox();
-						analysisReport.setPadding(new Insets(20));
-						Text analysis = new Text(analysisReport(oldFile, newFile));
-						analysisReport.getChildren().add(analysis);
-						analysisPopup.setScene(new Scene(analysisReport, 250, 150));
-						analysisPopup.setResizable(false);
-						analysisPopup.show();
-					}
+					if (analysisCheckBox.isSelected()) 
+						analysisWindow(oldFile, newFile);
 				}
-				else errorWindow("Same input and output path.");
-				
-				if(sc != null) sc.close();
-		    }
+				if (sc != null)
+					sc.close();
+			}
 		});
 	}
 
@@ -156,11 +142,23 @@ public class FileFormatter extends Application{
 		errorPopup.show();
 	}
 	
+	public static void analysisWindow(File oldFile, File newFile) {
+		Stage analysisPopup = new Stage();
+		analysisPopup.setTitle("Analysis Report");
+		VBox analysisReport = new VBox();
+		analysisReport.setPadding(new Insets(20));
+		Text analysis = new Text(analysisReport(oldFile, newFile));
+		analysisReport.getChildren().add(analysis);
+		analysisPopup.setScene(new Scene(analysisReport, 250, 150));
+		analysisPopup.setResizable(false);
+		analysisPopup.show();
+	}
+
 	// Returns true if two files share the same path
 	private static boolean samePath(File file1, File file2) {
 		return file1.getAbsolutePath().equals(file2.getAbsolutePath());
 	}
-	
+
 	// Returns a string containing the analysis report
 	public static String analysisReport(File oldFile, File newFile) {
 		String report = "";
@@ -169,8 +167,7 @@ public class FileFormatter extends Application{
 		int wordsPerLine = 0;
 		int avgLineLength = 0;
 
-		if (lines != 0)
-		{
+		if (lines != 0) {
 			wordsPerLine = words / lines;
 			avgLineLength = totalLineLength(newFile) / lines;
 		}
@@ -185,27 +182,29 @@ public class FileFormatter extends Application{
 	// Writes from file to file
 	public static void writeFile(File inputFile, String newFileName, String justification) {
 		CreateFile newFile = new CreateFile();
-		newFile.openFile(newFileName);
+		if (!newFile.openFile(newFileName)) {
+			errorWindow("Could not open file.");
+		} else {
+			String next, line;
+			next = line = "";
 
-		String next, line;
-		next = line = "";
-
-		try {
-			sc = new Scanner(inputFile);
-			while (sc.hasNext()) {
-				next = sc.next();
-				if (line.length() + next.length() <= 80) // add word
-					line += next + " ";
-				else { // add line to text
-					newFile.writeToFile(line.trim() + "\r", justification);
-					line = next + " ";
+			try {
+				sc = new Scanner(inputFile);
+				while (sc.hasNext()) {
+					next = sc.next();
+					if (line.length() + next.length() <= linelength) // add word
+						line += next + " ";
+					else { // add line to text
+						newFile.writeToFile(line.trim() + "\r", justification, linelength);
+						line = next + " ";
+					}
 				}
+				newFile.writeToFile(line.trim(), justification, linelength);
+			} catch (FileNotFoundException e) {
+				errorWindow("Input file not found.");
 			}
-			newFile.writeToFile(line.trim(), justification);
-		} catch (FileNotFoundException e) {
-			errorWindow("Input file not found.");
+			newFile.closeFile();
 		}
-		newFile.closeFile();
 	}
 
 	// Count the length of all lines

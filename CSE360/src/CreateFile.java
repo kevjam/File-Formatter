@@ -3,17 +3,19 @@ import java.util.Formatter;
 public class CreateFile {
 	private Formatter formatter;
 	
-	public void openFile(String fileName) {
+	public boolean openFile(String fileName) {
+		boolean successful = true;
 		try {
 			formatter = new Formatter(fileName);
 		}catch(Exception e) {
-			System.out.println("Could not open file.");
+			successful = false;
 		}
+		return successful;
 	}
 	
-	public void writeToFile(String line, String justified) {
+	public void writeToFile(String line, String justified, int linelength) {
 		if(justified.equals("right"))
-			writeRightJustified(line);
+			writeRightJustified(line, linelength);
 		else
 			writeLeftJustified(line);
 	}
@@ -22,8 +24,8 @@ public class CreateFile {
 		formatter.format("%s",line);
 	}
 	
-	public void writeRightJustified(String line) {
-		formatter.format("%81s", line);
+	public void writeRightJustified(String line, int linelength) {
+		formatter.format("%"+(linelength+1)+"s", line);
 	}
 	
 	public void closeFile() {
