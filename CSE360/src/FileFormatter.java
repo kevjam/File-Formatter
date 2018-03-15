@@ -24,33 +24,19 @@ public class FileFormatter extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		// Input File Field
-		HBox txtField = new HBox();
-		Text txt = new Text("Input File: \t");
 		TextField inputField = new TextField();
-		inputField.setDisable(true);
 		Button inputBrowse = new Button("Browse");
-		txtField.getChildren().addAll(txt, inputField, inputBrowse);
+		HBox inputBox = textBox("Input File: \t", inputField, inputBrowse);
 
 		// Ouput File Field
-		HBox txtField2 = new HBox();
-		Text txt2 = new Text("Output File: \t");
 		TextField outputField = new TextField();
-		outputField.setDisable(true);
 		Button outputBrowse = new Button("Browse");
-		txtField2.getChildren().addAll(txt2, outputField, outputBrowse);
+		HBox outputBox = textBox("Output File: \t", outputField, outputBrowse);
 
 		// Justification Selection
-		HBox justification = new HBox();
-		ToggleGroup group = new ToggleGroup();
-		Text txt3 = new Text("Justification: \t");
 		RadioButton left = new RadioButton("Left (default)");
-		left.setToggleGroup(group);
-		left.setSelected(true);
 		RadioButton right = new RadioButton("Right");
-		right.setToggleGroup(group);
-		right.setSelected(false);
-		justification.setSpacing(20);
-		justification.getChildren().addAll(txt3, left, right);
+		HBox justification = radioButtonBox("Justification: \t", left, right);
 
 		// Run program / analysis
 		HBox operations = new HBox();
@@ -62,7 +48,7 @@ public class FileFormatter extends Application {
 		// Root pane
 		VBox root = new VBox();
 		VBox txtFields = new VBox();
-		txtFields.getChildren().addAll(txtField, txtField2);
+		txtFields.getChildren().addAll(inputBox, outputBox);
 		root.setSpacing(5);
 		root.setPadding(new Insets(20));
 		root.getChildren().addAll(txtFields, justification, operations);
@@ -128,6 +114,31 @@ public class FileFormatter extends Application {
 			}
 		});
 	}
+	
+	// Sets up an HBox for a file field and browse button
+	public static HBox textBox(String prompt, TextField field, Button button) {
+		HBox textBox = new HBox();
+		Text txt = new Text(prompt);
+		field.setDisable(true);
+		textBox.getChildren().addAll(txt, field, button);
+		return textBox;
+	 }
+	
+	// Sets up an HBox for a grouped radiobutton selection
+	public static HBox radioButtonBox(String prompt, RadioButton... buttons) {
+		HBox radioButtonBox = new HBox();
+		ToggleGroup group = new ToggleGroup();
+		Text txt = new Text(prompt);
+		
+		radioButtonBox.getChildren().add(txt);
+		for(int i = 0; i < buttons.length; i++) {
+			buttons[i].setToggleGroup(group);
+			radioButtonBox.getChildren().add(buttons[i]);
+		}
+		buttons[0].setSelected(true);
+		radioButtonBox.setSpacing(20);
+		return radioButtonBox;
+	}
 
 	// Takes a string as a message and creates an error popup
 	public static void errorWindow(String message) {
@@ -142,6 +153,8 @@ public class FileFormatter extends Application {
 		errorPopup.show();
 	}
 	
+	// Method to create an analysisWindow popup containing calculations
+	// performed on two files
 	public static void analysisWindow(File oldFile, File newFile) {
 		Stage analysisPopup = new Stage();
 		analysisPopup.setTitle("Analysis Report");
