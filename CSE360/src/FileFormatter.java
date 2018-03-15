@@ -208,7 +208,7 @@ public class FileFormatter extends Application {
 					if (line.length() + next.length() <= linelength) // add word
 						line += next + " ";
 					else { // add line to text
-						newFile.writeToFile(line.trim() + "\r", justification, linelength);
+						newFile.writeToFile(line.trim(), justification, linelength);
 						line = next + " ";
 					}
 				}

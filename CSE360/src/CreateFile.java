@@ -14,18 +14,16 @@ public class CreateFile {
 	}
 	
 	public void writeToFile(String line, String justified, int linelength) {
-		if(justified.equals("right"))
-			writeRightJustified(line, linelength);
-		else
-			writeLeftJustified(line);
+		if(justified.equals("right")) writeRightJustified(line, linelength);
+		else writeLeftJustified(line);
 	}
 	
 	public void writeLeftJustified(String line) {
-		formatter.format("%s",line);
+		formatter.format("%s%n",line);
 	}
 	
 	public void writeRightJustified(String line, int linelength) {
-		formatter.format("%"+(linelength+1)+"s", line);
+		formatter.format("%"+linelength+"s%n", line);
 	}
 	
 	public void closeFile() {
