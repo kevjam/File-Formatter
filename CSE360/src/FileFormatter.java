@@ -5,17 +5,34 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 
 public class FileFormatter extends Application {
 	private static Scanner sc;
+	
+	// remove once implemented as user input
 	public static final int linelength = 80;
+	
+	public static final int width = 350;
+	public static final int height = 150;
+	public static final int minLength = 20;
+	public static final int defaultLength = 80;
+	public static final int maxLength = 999;
+	public static final int maxDigits = 3;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -32,11 +49,20 @@ public class FileFormatter extends Application {
 		TextField outputField = new TextField();
 		Button outputBrowse = new Button("Browse");
 		HBox outputBox = textBox("Output File: \t", outputField, outputBrowse);
+		
+		// Line Length input field
+		// Spinner(minimum, maximum, default, increment by)
+		Spinner<Integer> lengthField = new 
+				Spinner<Integer>(minLength,maxLength,defaultLength,1);
+		lengthField.setEditable(true);
+		Text prompt = new Text("Line length: \t");
+		HBox lengthBox = new HBox(prompt, lengthField);
 
 		// Justification Selection
 		RadioButton left = new RadioButton("Left (default)");
 		RadioButton right = new RadioButton("Right");
-		HBox justification = radioButtonBox("Justification: \t", left, right);
+		RadioButton full = new RadioButton("Full");
+		HBox justification = radioButtonBox("Justification: \t", left, right, full);
 
 		// Run program / analysis
 		HBox operations = new HBox();
@@ -48,17 +74,27 @@ public class FileFormatter extends Application {
 		// Root pane
 		VBox root = new VBox();
 		VBox txtFields = new VBox();
-		txtFields.getChildren().addAll(inputBox, outputBox);
+		txtFields.getChildren().addAll(lengthBox, inputBox, outputBox);
 		root.setSpacing(5);
-		root.setPadding(new Insets(20));
+		root.setPadding(new Insets(10));
 		root.getChildren().addAll(txtFields, justification, operations);
 
 		// Primary Stage
 		primaryStage.setTitle("File Formatter");
-		primaryStage.setScene(new Scene(root, 350, 150));
+		primaryStage.setScene(new Scene(root, width, height));
 		primaryStage.setResizable(false);
 		primaryStage.show();
-
+		
+		// Line length input
+		lengthField.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
+			  @Override public void handle(KeyEvent keyEvent) {
+			    if (!"0123456789".contains(keyEvent.getCharacter()))
+			      keyEvent.consume();
+			    if(lengthField.getEditor().getText().length() >= maxDigits)
+			    	keyEvent.consume();
+			  }
+			});
+		
 		// Input File Browser
 		inputBrowse.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -136,7 +172,7 @@ public class FileFormatter extends Application {
 			radioButtonBox.getChildren().add(buttons[i]);
 		}
 		buttons[0].setSelected(true);
-		radioButtonBox.setSpacing(20);
+		radioButtonBox.setSpacing(10);
 		return radioButtonBox;
 	}
 
@@ -145,12 +181,22 @@ public class FileFormatter extends Application {
 		Stage errorPopup = new Stage();
 		errorPopup.setTitle("Error!");
 		VBox errorBox = new VBox();
-		errorBox.setPadding(new Insets(20));
+		errorBox.setPadding(new Insets(10));
+		errorBox.setSpacing(10);
 		Text error = new Text(message);
-		errorBox.getChildren().add(error);
-		errorPopup.setScene(new Scene(errorBox, 250, 100));
+		error.setFill(Color.RED);
+		Button OK = new Button("OK");
+		errorBox.getChildren().addAll(error, OK);
+		errorPopup.setScene(new Scene(errorBox, width, height / 2));
 		errorPopup.setResizable(false);
 		errorPopup.show();
+		
+		OK.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				errorPopup.close();
+			}
+		});
 	}
 	
 	// Method to create an analysisWindow popup containing calculations
@@ -162,7 +208,7 @@ public class FileFormatter extends Application {
 		analysisReport.setPadding(new Insets(20));
 		Text analysis = new Text(analysisReport(oldFile, newFile));
 		analysisReport.getChildren().add(analysis);
-		analysisPopup.setScene(new Scene(analysisReport, 250, 150));
+		analysisPopup.setScene(new Scene(analysisReport, width - 100, height));
 		analysisPopup.setResizable(false);
 		analysisPopup.show();
 	}
@@ -227,7 +273,7 @@ public class FileFormatter extends Application {
 			sc = new Scanner(file);
 
 			while (sc.hasNextLine())
-				totalLineLength += sc.nextLine().trim().length();
+				totalLineLength += sc.nextLine().length();
 		} catch (FileNotFoundException e) {
 			errorWindow("Output file not found.");
 		}
