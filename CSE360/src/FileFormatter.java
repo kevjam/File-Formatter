@@ -29,7 +29,7 @@ public class FileFormatter extends Application {
 	public static final int linelength = 80;
 
 	public static final int width = 350;
-	public static final int height = 150;
+	public static final int height = 175;
 	public static final int minLength = 20;
 	public static final int defaultLength = 80;
 	public static final int maxLength = 999;
@@ -59,10 +59,15 @@ public class FileFormatter extends Application {
 		HBox lengthBox = new HBox(prompt, lengthField);
 
 		// Justification Selection
-		RadioButton left = new RadioButton("Left (default)");
-		RadioButton right = new RadioButton("Right");
+		RadioButton left = new RadioButton("Left (default)\t");
+		RadioButton right = new RadioButton("Right\t");
 		RadioButton full = new RadioButton("Full");
 		HBox justification = radioButtonBox("Justification: \t", left, right, full);
+		
+		// Spacing selection
+		RadioButton singleSpace = new RadioButton("Single (default)");
+		RadioButton doubleSpace = new RadioButton("Double\t");
+		HBox spacing = radioButtonBox("Spacing: \t\t", singleSpace, doubleSpace);
 
 		// Run program / analysis
 		HBox operations = new HBox();
@@ -73,11 +78,9 @@ public class FileFormatter extends Application {
 
 		// Root pane
 		VBox root = new VBox();
-		VBox txtFields = new VBox();
-		txtFields.getChildren().addAll(lengthBox, inputBox, outputBox);
 		root.setSpacing(5);
 		root.setPadding(new Insets(10));
-		root.getChildren().addAll(txtFields, justification, operations);
+		root.getChildren().addAll(lengthBox, inputBox, outputBox, justification, spacing, operations);
 
 		// Primary Stage
 		primaryStage.setTitle("File Formatter");
