@@ -2,6 +2,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -11,7 +13,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -23,10 +24,10 @@ import javafx.stage.Stage;
 
 public class FileFormatter extends Application {
 	private static Scanner sc;
-	
+
 	// remove once implemented as user input
 	public static final int linelength = 80;
-	
+
 	public static final int width = 350;
 	public static final int height = 150;
 	public static final int minLength = 20;
@@ -49,13 +50,12 @@ public class FileFormatter extends Application {
 		TextField outputField = new TextField();
 		Button outputBrowse = new Button("Browse");
 		HBox outputBox = textBox("Output File: \t", outputField, outputBrowse);
-		
+
 		// Line Length input field
 		// Spinner(minimum, maximum, default, increment by)
-		Spinner<Integer> lengthField = new 
-				Spinner<Integer>(minLength,maxLength,defaultLength,1);
+		Spinner<Integer> lengthField = new Spinner<Integer>(minLength, maxLength, defaultLength, 1);
 		lengthField.setEditable(true);
-		Text prompt = new Text("Line length: \t");
+		Text prompt = new Text("Line Length: \t");
 		HBox lengthBox = new HBox(prompt, lengthField);
 
 		// Justification Selection
@@ -84,17 +84,23 @@ public class FileFormatter extends Application {
 		primaryStage.setScene(new Scene(root, width, height));
 		primaryStage.setResizable(false);
 		primaryStage.show();
-		
-		// Line length input
-		lengthField.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
-			  @Override public void handle(KeyEvent keyEvent) {
-			    if (!"0123456789".contains(keyEvent.getCharacter()))
-			      keyEvent.consume();
-			    if(lengthField.getEditor().getText().length() >= maxDigits)
-			    	keyEvent.consume();
-			  }
-			});
-		
+
+		// Handles input for lengthField
+		lengthField.getEditor().textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+				if (arg2.length() > maxDigits) // reset to old value if too many digits
+					lengthField.getEditor().setText(arg1);
+				else if (arg2.length() > arg1.length())
+					for (char c = 0; c < arg2.length(); c++) { // prevent strings/non-numerical chars
+						if (arg2.charAt(c) < '0' || arg2.charAt(c) > '9') {
+							lengthField.getEditor().setText(arg1);
+							System.out.println(c);
+						}
+					}
+			}
+		});
+
 		// Input File Browser
 		inputBrowse.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -128,8 +134,10 @@ public class FileFormatter extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 				String justified;
-				if (left.isSelected()) justified = "left";
-				else justified = "right";
+				if (left.isSelected())
+					justified = "left";
+				else
+					justified = "right";
 
 				String oldFileName = inputField.getText();
 				String newFileName = outputField.getText();
@@ -137,12 +145,15 @@ public class FileFormatter extends Application {
 				File newFile = new File(newFileName);
 
 				// Write to file if not in the same path
-				if(oldFileName.equals("")) errorWindow("No input file selected.");
-				else if(newFileName.equals("")) errorWindow("No output file selected.");
-				else if (samePath(oldFile, newFile)) errorWindow("Same input and output path.");
+				if (oldFileName.equals(""))
+					errorWindow("No input file selected.");
+				else if (newFileName.equals(""))
+					errorWindow("No output file selected.");
+				else if (samePath(oldFile, newFile))
+					errorWindow("Same input and output path.");
 				else {
 					writeFile(oldFile, newFileName, justified);
-					if (analysisCheckBox.isSelected()) 
+					if (analysisCheckBox.isSelected())
 						analysisWindow(oldFile, newFile);
 				}
 				if (sc != null)
@@ -150,7 +161,7 @@ public class FileFormatter extends Application {
 			}
 		});
 	}
-	
+
 	// Sets up an HBox for a file field and browse button
 	public static HBox textBox(String prompt, TextField field, Button button) {
 		HBox textBox = new HBox();
@@ -158,16 +169,16 @@ public class FileFormatter extends Application {
 		field.setDisable(true);
 		textBox.getChildren().addAll(txt, field, button);
 		return textBox;
-	 }
-	
+	}
+
 	// Sets up an HBox for a grouped radiobutton selection
 	public static HBox radioButtonBox(String prompt, RadioButton... buttons) {
 		HBox radioButtonBox = new HBox();
 		ToggleGroup group = new ToggleGroup();
 		Text txt = new Text(prompt);
-		
+
 		radioButtonBox.getChildren().add(txt);
-		for(int i = 0; i < buttons.length; i++) {
+		for (int i = 0; i < buttons.length; i++) {
 			buttons[i].setToggleGroup(group);
 			radioButtonBox.getChildren().add(buttons[i]);
 		}
@@ -190,7 +201,7 @@ public class FileFormatter extends Application {
 		errorPopup.setScene(new Scene(errorBox, width, height / 2));
 		errorPopup.setResizable(false);
 		errorPopup.show();
-		
+
 		OK.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
@@ -198,7 +209,7 @@ public class FileFormatter extends Application {
 			}
 		});
 	}
-	
+
 	// Method to create an analysisWindow popup containing calculations
 	// performed on two files
 	public static void analysisWindow(File oldFile, File newFile) {
