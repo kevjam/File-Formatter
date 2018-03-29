@@ -136,10 +136,10 @@ public class FileFormatter extends Application {
 		runButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				String justified;
+				String justified = "left";
 				if (left.isSelected())
 					justified = "left";
-				else
+				else if(right.isSelected())
 					justified = "right";
 
 				String oldFileName = inputField.getText();
