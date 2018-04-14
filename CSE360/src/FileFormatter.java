@@ -26,7 +26,7 @@ public class FileFormatter extends Application {
 	private static Scanner sc;
 
 	// changed from a constant to a regular variable
-	private static int linelength = 80;
+	private static int lineLength;
 
 	public static final int width = 350;
 	public static final int height = 175;
@@ -44,6 +44,8 @@ public class FileFormatter extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
+		lineLength = defaultLength;
+		
 		// Input File Field
 		TextField inputField = new TextField();
 		Button inputBrowse = new Button("Browse");
@@ -95,15 +97,16 @@ public class FileFormatter extends Application {
 		lengthField.getEditor().textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
-				if (arg2.length() > maxDigits) // reset to old value if too many digits
+				if (arg2.length() > maxDigits) { // reset to old value if too many digits
 					lengthField.getEditor().setText(arg1);
-				else if (arg2.length() > arg1.length())
+				} else if (arg2.length() > arg1.length()){
 					for (char c = 0; c < arg2.length(); c++) { // prevent strings/non-numerical chars
 						if (arg2.charAt(c) < '0' || arg2.charAt(c) > '9') {
 							lengthField.getEditor().setText(arg1);
 							System.out.println(c);
 						} // End of if statement
 					} // End of for loop
+				} // End of outer if else statement
 			} // End of changed method
 		}); // End of lengthField change handler
 
@@ -141,6 +144,7 @@ public class FileFormatter extends Application {
 			public void handle(ActionEvent e) {
 				String justified = "left";
 				String spacing = "single";
+				lineLength = lengthField.getValue();
 				
 				// If the left radio button is selected
 				if (left.isSelected()) {
@@ -282,14 +286,14 @@ public class FileFormatter extends Application {
 				sc = new Scanner(inputFile);
 				while (sc.hasNext()) {
 					next = sc.next();
-					if (line.length() + next.length() <= linelength) // add word
+					if (line.length() + next.length() <= lineLength) // add word
 						line += next + " ";
 					else { // add line to text
-						newFile.writeToFile(line.trim(), true, justification, spacing, linelength);
+						newFile.writeToFile(line.trim(), true, justification, spacing, lineLength);
 						line = next + " ";
 					} // End of inner if else statement
 				} // End of while loop
-				newFile.writeToFile(line.trim(), false, justification, spacing, linelength);
+				newFile.writeToFile(line.trim(), false, justification, spacing, lineLength);
 			} catch (FileNotFoundException e) {
 				errorWindow("Input file not found.");
 			} // End of try catch
