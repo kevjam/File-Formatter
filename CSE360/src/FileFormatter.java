@@ -103,7 +103,6 @@ public class FileFormatter extends Application {
 					for (char c = 0; c < arg2.length(); c++) { // prevent strings/non-numerical chars
 						if (arg2.charAt(c) < '0' || arg2.charAt(c) > '9') {
 							lengthField.getEditor().setText(arg1);
-							System.out.println(c);
 						} // End of if statement
 					} // End of for loop
 				} // End of outer if else statement
