@@ -152,7 +152,9 @@ public class FileFormatter extends Application {
 				// Else if the right radio button is selected
 				} else if (right.isSelected()) {
 					justified = "right";
-				} // End of if else if statement
+				} else if (full.isSelected()) {
+					justified = "full";
+				}// End of if else if statement
 				
 				if (singleSpace.isSelected()) {
 					spacing = "single";
