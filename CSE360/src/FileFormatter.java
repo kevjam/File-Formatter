@@ -271,6 +271,7 @@ public class FileFormatter extends Application {
 		report += blankLines(oldFile) + "\tblank lines removed.\n";
 		report += wordsPerLine + "\taverage words per line.\n";
 		report += avgLineLength + "\taverage line length.\n";
+		report += spaceCount(newFile) + "\tspaces added.\n";
 		return report;
 	} // End of analysisReport method
 
@@ -331,6 +332,27 @@ public class FileFormatter extends Application {
 		return count;
 	} // End of blankLines
 
+	// Counts the spaces in a given file
+	public static int spaceCount(File file) {
+		int count = 0;
+		try {
+			sc = new Scanner(file);
+			while (sc.hasNextLine()) {
+				String fileIterator = sc.nextLine();
+				char[] charsInFile = fileIterator.toCharArray();
+				for (int i = 0; i < charsInFile.length; i++) {
+					if (charsInFile[i] == ' ') {
+						count++;
+					} // End of if statement
+				} // End of for loop
+			} // End of while loop
+			
+		} catch (FileNotFoundException e) {
+			errorWindow("Output file not found.");
+		} // End of try catch
+		return count;
+	} // End of spaceCount method
+	
 	// Counts the words in a given file
 	public static int wordCount(File file) {
 		int count = 0;
@@ -345,7 +367,7 @@ public class FileFormatter extends Application {
 		} // End of try catch
 		return count;
 	} // End of wordCount method
-
+	
 	// Counts the lines in a given file
 	public static int lineCount(File file) {
 		int count = 0;
