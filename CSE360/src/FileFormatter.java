@@ -35,7 +35,6 @@ public class FileFormatter extends Application {
 	
 	// changed to 100 based on user guide
 	public static final int maxLength = 100;
-	
 	public static final int maxDigits = 3;
 
 	public static void main(String[] args) {
